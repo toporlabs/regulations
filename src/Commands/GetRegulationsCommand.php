@@ -9,15 +9,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Regulations\Services\CommandService as Service;
 
 /**
- * GetConfigCommand class
+ * GetRegulationsCommand class
  *
- * This class gets the requested file from remote (or local) server,
- * validates data and updates this file in application.
+ * This class gets the requested file from remote (or local) server
+ * and updates this file in application.
  *
  * Example usage:
- * To update .env file just call in console:
+ * To update regulations in english file just call in console:
  *
- * php artisan config:get http://your_remote_server_url/.env
+ * php artisan regulations:get http://your_remote_server_url/en.html
  *
  * @package  Regulations
  * @author   Cezary Strąk <cezary.strak@upaid.pl>
@@ -30,7 +30,7 @@ class GetRegulationsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Update application config.';
+    protected $description = 'Update regulations.';
 
     /**
      * Command service
@@ -40,7 +40,7 @@ class GetRegulationsCommand extends Command
     public $cfgService;
 
     /**
-     * GetConfigCommand constructor.
+     * GetRegulationsCommand constructor.
      *
      * @param Service $service
      */
@@ -57,8 +57,8 @@ class GetRegulationsCommand extends Command
     {
         $this
             ->setName('regulations:get {param}')
-            ->setDescription('Get config for application from remote server.')
-            ->setAliases(['getConfig'])
+            ->setDescription('Get regulations from remote server.')
+            ->setAliases(['getRegulations'])
             ->setDefinition(
                 [new InputArgument('param', InputArgument::OPTIONAL),]
             );
@@ -78,7 +78,7 @@ class GetRegulationsCommand extends Command
         $param = $input->getArgument('param');
 
         if (empty($param)) {
-            $answer = $this->ask('Define configuration server url');
+            $answer = $this->ask('Define regulations server url');
         }
 
         $url = $answer ? $answer : $param;
@@ -88,12 +88,12 @@ class GetRegulationsCommand extends Command
         $urlAppName = prev($exploded);
 
         $output->writeln('Trying to get ' . $urlFilename . ' from: ' . $url);
-        $this->getConfig($url, $output, $urlFilename, $urlAppName);
+        $this->getRegulations($url, $output, $urlFilename, $urlAppName);
 
     }
 
     /**
-     * Get configuration
+     * Get regulations
      *
      * @param                 $url
      * @param OutputInterface $output
@@ -102,7 +102,7 @@ class GetRegulationsCommand extends Command
      *
      * @return mixed
      */
-    private function getConfig($url, OutputInterface $output, $fileName, $appName)
+    private function getRegulations($url, OutputInterface $output, $fileName, $appName)
     {
         $ext = pathinfo($url, PATHINFO_EXTENSION);
 
@@ -123,38 +123,33 @@ class GetRegulationsCommand extends Command
                 return;
             }
 
-            if (config('regulations.validate_files') && !$this->cfgService->validate($data, $ext)) {
-                $output->writeln('Validation of remote ' . $fileName . ' file failed!');
-            } else {
-                $output->writeln(
-                    'Configuration downloaded and validated.'
-                );
-                $output->writeln('Creating backup...');
-                $backupResponse = $this->createBackup($fileName, $appName);
-                switch ($backupResponse['code']) {
-                    case 0:
-                        $output->writeln(
-                            'File ' . $fileName . ' already backuped!'
-                        );
-                        break;
-                    case 1:
-                        $output->writeln(
-                            'Backup created successfully!'
-                        );
-                        break;
-                    case 2:
-                        $output->writeln('Failed to create backup!');
-                        break;
-                }
-
-                $output->writeln('Updating ' . $fileName . ' file...');
-
-                $message = $this->updateFile($fileName, $data, $appName)
-                    ? 'File update success!'
-                    : 'Failed to update ' . $fileName . ' file!';
-
-                $output->writeln($message);
+            $output->writeln('Regulations downloaded');
+            $output->writeln('Creating backup...');
+            $backupResponse = $this->createBackup($fileName, $appName);
+            switch ($backupResponse['code']) {
+                case 0:
+                    $output->writeln(
+                        'File ' . $fileName . ' already backuped!'
+                    );
+                    break;
+                case 1:
+                    $output->writeln(
+                        'Backup created successfully!'
+                    );
+                    break;
+                case 2:
+                    $output->writeln('Failed to create backup!');
+                    break;
             }
+
+            $output->writeln('Updating ' . $fileName . ' file...');
+
+            $message = $this->updateFile($fileName, $data, $appName)
+                ? 'File update success!'
+                : 'Failed to update ' . $fileName . ' file!';
+
+            $output->writeln($message);
+
             curl_close($curl);
         } catch (\Exception $ex) {
             $output->writeln('Failed to get content of ' . $fileName . ' file from: ' . $url);
@@ -163,7 +158,7 @@ class GetRegulationsCommand extends Command
     }
 
     /**
-     * Updates downloaded configuration data to requested file
+     * Updates downloaded regulations data to requested file
      *
      * @param $fileName
      * @param $data
@@ -227,12 +222,12 @@ class GetRegulationsCommand extends Command
             return ['code' => 2];
         }
 
-        $fileExist = file_exists('config_backup/' . $fileName . '.bc');
+        $fileExist = file_exists('regulations_backup/' . $fileName . '.bc');
 
-        $isEqual = (is_dir('config_backup') && $fileExist) ? md5(file_get_contents($filePath)) === md5(file_get_contents('config_backup/' . $fileName . '.bc')) : false;
+        $isEqual = (is_dir('regulations_backup') && $fileExist) ? md5(file_get_contents($filePath)) === md5(file_get_contents('regulations_backup/' . $fileName . '.bc')) : false;
 
         if (!$isEqual) {
-            $return = ($this->cfgService->makeBcDir() && copy($filePath, 'config_backup/' . $fileName . '.bc')) ?
+            $return = ($this->cfgService->makeBcDir() && copy($filePath, 'regulations_backup/' . $fileName . '.bc')) ?
                 ['code' => 1] :
                 ['code' => 2];
         } else {

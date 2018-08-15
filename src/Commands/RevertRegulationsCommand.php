@@ -9,14 +9,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Regulations\Services\CommandService as Service;
 
 /**
- * RevertConfigCommand class
+ * RevertRegulationsCommand class
  *
  * This class reverts the requested file from backup directory.
  *
  * Example usage:
- * To revert .env file just call in console:
+ * To revert en.html file just call in console:
  *
- * php artisan config:revert .env your_app_name
+ * php artisan regulations:revert en.html your_app_name
  * (your_app_name is the name of the folder in a remote repository where the file is located)
  *
  * @package  Regulations
@@ -25,7 +25,7 @@ use Regulations\Services\CommandService as Service;
 class RevertRegulationsCommand extends Command
 {
     /**
-     * RevertConfigCommand constructor.
+     * RevertRegulationsCommand constructor.
      *
      * @param Service $service
      */
@@ -47,7 +47,7 @@ class RevertRegulationsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Revert application config from backup directory.';
+    protected $description = 'Revert regulations from backup directory.';
 
     /**
      * Configure command
@@ -56,8 +56,8 @@ class RevertRegulationsCommand extends Command
     {
         $this
             ->setName('regulations:revert {param}')
-            ->setDescription('Revert application config from backup directory.')
-            ->setAliases(['revertConfig'])
+            ->setDescription('Revert regulations from backup directory.')
+            ->setAliases(['revertRegulations'])
             ->setDefinition(
                 [new InputArgument('fileName', InputArgument::REQUIRED),
                 new InputArgument('appName', InputArgument::OPTIONAL),]
@@ -77,7 +77,7 @@ class RevertRegulationsCommand extends Command
             $output->writeln('Trying to revert ' . $fileName . ' file from backup directory...');
             $message = $this->revertFromBc($fileName, $appName) ?
                 'File reverted successfully!' :
-                'File revert failed! If You trying to revert file other than .env, please add second parameter app_name!';
+                'File revert failed!';
             $output->writeln($message);
         } else {
             $output->writeln('Backup does not exist!');
