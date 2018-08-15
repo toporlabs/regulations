@@ -11,17 +11,6 @@ class RegulationsServiceProvider extends ServiceProvider
         'Regulations\Commands\RevertRegulationsCommand',
     ];
 
-
-    /**
-     * Bootstrap the application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-//        require_once(__DIR__ . '/../Config/config.php');
-    }
-
     /**
      * Register the application services.
      *
@@ -29,7 +18,6 @@ class RegulationsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-//        $this->mergeConfigFrom( __DIR__ . '/../Config/config.php', 'regulations');
-//        $this->commands($this->commands);
+        $this->commands($this->commands);
     }
 }
