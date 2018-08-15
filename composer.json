@@ -1,11 +1,11 @@
 {
-  "name": "upaid/regulations",
+  "name": "toporlabs/regulations",
   "description": "Download configuration from remote repository by artisan command.",
   "license": "MIT",
-  "homepage": "https://github.com/uPaid/regulations",
+  "homepage": "https://github.com/toporlabs/regulations",
   "autoload": {
     "psr-4": {
-      "Upaidpckg\\Config\\": "src"
+      "Regulations\\Config\\": "src"
     }
   },
   "require": {

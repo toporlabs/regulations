@@ -19,8 +19,8 @@ use Regulations\Services\CommandService as Service;
  *
  * php artisan config:get http://your_remote_server_url/.env
  *
- * @package  Upaidpckg
- * @author   Michał Zwierzyński <michal.zwierzynski@upaid.pl>
+ * @package  Regulations
+ * @author   Cezary Strąk <cezary.strak@upaid.pl>
  */
 class GetRegulationsCommand extends Command
 {
@@ -123,7 +123,7 @@ class GetRegulationsCommand extends Command
                 return;
             }
 
-            if (config('upaidpckg.validate_files') && !$this->cfgService->validate($data, $ext)) {
+            if (config('regulations.validate_files') && !$this->cfgService->validate($data, $ext)) {
                 $output->writeln('Validation of remote ' . $fileName . ' file failed!');
             } else {
                 $output->writeln(

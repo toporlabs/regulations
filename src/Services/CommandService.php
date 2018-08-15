@@ -16,7 +16,7 @@ class CommandService
     public function getFilePath($fileName, $appName)
     {
         $filePath = null;
-        $keyPaths = config('upaidpckg.keys_paths');
+        $keyPaths = config('regulations.keys_paths');
 
         if (isset($keyPaths[$fileName])) {
             $path = $keyPaths[$fileName];

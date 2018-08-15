@@ -19,8 +19,8 @@ use Regulations\Services\CommandService as Service;
  * php artisan config:revert .env your_app_name
  * (your_app_name is the name of the folder in a remote repository where the file is located)
  *
- * @package  Upaidpckg
- * @author   Michał Zwierzyński <michal.zwierzynski@upaid.pl>
+ * @package  Regulations
+ * @author   Cezary Strąk <cezary.strak@upaid.pl>
  */
 class RevertRegulationsCommand extends Command
 {
