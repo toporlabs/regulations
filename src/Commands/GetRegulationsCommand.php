@@ -24,7 +24,6 @@ use Toporlabs\Regulations\Services\CommandService as Service;
  */
 class GetRegulationsCommand extends Command
 {
-
     /**
      * The console command description.
      *
@@ -98,11 +97,10 @@ class GetRegulationsCommand extends Command
      * @param                 $url
      * @param OutputInterface $output
      * @param                 $fileName
-     * @param                 $appName
      *
      * @return mixed
      */
-    private function getRegulations($url, OutputInterface $output, $fileName, $appName)
+    private function getRegulations($url, OutputInterface $output, $fileName)
     {
         $ext = pathinfo($url, PATHINFO_EXTENSION);
 
@@ -119,13 +117,19 @@ class GetRegulationsCommand extends Command
                     . '. Check http://php.net/manual/en/function.curl-errno.php for more information.'
                 );
                 curl_close($curl);
-
                 return;
             }
 
+            if(curl_getinfo($curl, CURLINFO_RESPONSE_CODE) !== 200){
+                $output->writeln('File not found');
+                curl_close($curl);
+                return;
+            }
+
+
             $output->writeln('Regulations downloaded');
             $output->writeln('Creating backup...');
-            $backupResponse = $this->createBackup($fileName, $appName);
+            $backupResponse = $this->createBackup($fileName);
             switch ($backupResponse['code']) {
                 case 0:
                     $output->writeln(
@@ -144,7 +148,7 @@ class GetRegulationsCommand extends Command
 
             $output->writeln('Updating ' . $fileName . ' file...');
 
-            $message = $this->updateFile($fileName, $data, $appName)
+            $message = $this->updateFile($fileName, $data)
                 ? 'File update success!'
                 : 'Failed to update ' . $fileName . ' file!';
 
@@ -162,13 +166,12 @@ class GetRegulationsCommand extends Command
      *
      * @param $fileName
      * @param $data
-     * @param $appName
      *
      * @return bool
      */
-    private function updateFile($fileName, $data, $appName)
+    private function updateFile($fileName, $data)
     {
-        $filePath = $this->cfgService->getFilePath($fileName, $appName);
+        $filePath = $this->cfgService->getFilePath($fileName);
         if(preg_match('/[\/\\\\]/', $filePath)) {
             $this->createDirIfNotExists($this->getDirPath($filePath));
         }
@@ -208,32 +211,29 @@ class GetRegulationsCommand extends Command
      * Creates backup of file
      *
      * @param $fileName
-     * @param $appName
      *
      * @return array :
      * 'code' => 0 | File already backuped. Original file and backuped fila are the same. No need to backup it again.
      * 'code' => 1 | Backup created successfully!
      * 'code' => 2 | Failed to create backup!
      */
-    private function createBackup($fileName, $appName)
+    private function createBackup($fileName)
     {
-        $filePath = $this->cfgService->getFilePath($fileName, $appName);
+        $filePath = Service::REGULATIONS_DIRECTORY . DIRECTORY_SEPARATOR . $fileName;
         if (!file_exists($filePath)) {
             return ['code' => 2];
         }
+        $fileExist = file_exists(Service::BACKUP_DIRECTORY . DIRECTORY_SEPARATOR . $fileName);
 
-        $fileExist = file_exists('regulations_backup/' . $fileName . '.bc');
-
-        $isEqual = (is_dir('regulations_backup') && $fileExist) ? md5(file_get_contents($filePath)) === md5(file_get_contents('regulations_backup/' . $fileName . '.bc')) : false;
+        $isEqual = (is_dir(Service::BACKUP_DIRECTORY) && $fileExist) ? md5(file_get_contents($filePath)) === md5(file_get_contents(Service::BACKUP_DIRECTORY . DIRECTORY_SEPARATOR . $fileName)) : false;
 
         if (!$isEqual) {
-            $return = ($this->cfgService->makeBcDir() && copy($filePath, 'regulations_backup/' . $fileName . '.bc')) ?
+            $return = ($this->cfgService->makeBcDir() && copy($filePath, Service::BACKUP_DIRECTORY . DIRECTORY_SEPARATOR . $fileName)) ?
                 ['code' => 1] :
                 ['code' => 2];
         } else {
             $return = ['code' => 0];
         }
-
         return $return;
     }
 }

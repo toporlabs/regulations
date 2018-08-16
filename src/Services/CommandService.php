@@ -5,25 +5,20 @@ namespace Toporlabs\Regulations\Services;
 
 class CommandService
 {
+
+    const BACKUP_DIRECTORY = 'storage/regulations_backup';
+    const REGULATIONS_DIRECTORY = 'storage/regulations';
+
     /**
      * Gets full path to file in application.
      *
      * @param $fileName
-     * @param $appName
      *
      * @return null|string
      */
-    public function getFilePath($fileName, $appName)
+    public function getFilePath($fileName)
     {
-        $filePath = null;
-        $keyPaths = config('regulations.keys_paths');
-
-        if (isset($keyPaths[$fileName])) {
-            $path = $keyPaths[$fileName];
-            $filePath =  str_replace('{appName}', $appName, $path) . $fileName;
-        }
-
-        return $filePath;
+        return 'storage/regulations/'. $fileName;
     }
 
     /**
@@ -33,8 +28,8 @@ class CommandService
      */
     function makeBcDir()
     {
-        $ret = @mkdir('regulations_backup');
-        return $ret === true || is_dir('regulations_backup');
+        $ret = @mkdir(self::BACKUP_DIRECTORY);
+        return $ret === true || is_dir(self::BACKUP_DIRECTORY);
     }
 
 }

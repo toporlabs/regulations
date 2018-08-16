@@ -8,7 +8,6 @@ class RegulationsServiceProvider extends ServiceProvider
 {
     protected $commands = [
         'Toporlabs\Regulations\Commands\GetRegulationsCommand',
-        'Toporlabs\Regulations\Commands\RevertRegulationsCommand',
     ];
 
     /**
