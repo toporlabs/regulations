@@ -1,14 +1,14 @@
 <?php
 
-namespace Regulations\Providers;
+namespace Toporlabs\Regulations\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
 class RegulationsServiceProvider extends ServiceProvider
 {
     protected $commands = [
-        'Regulations\Commands\GetRegulationsCommand',
-        'Regulations\Commands\RevertRegulationsCommand',
+        'Toporlabs\Regulations\Commands\GetRegulationsCommand',
+        'Toporlabs\Regulations\Commands\RevertRegulationsCommand',
     ];
 
     /**

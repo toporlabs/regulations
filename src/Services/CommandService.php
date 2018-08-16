@@ -1,6 +1,6 @@
 <?php
 
-namespace Regulations\Services;
+namespace Toporlabs\Regulations\Services;
 
 
 class CommandService

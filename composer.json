@@ -5,7 +5,7 @@
   "homepage": "https://github.com/toporlabs/regulations",
   "autoload": {
     "psr-4": {
-      "Regulations\\Config\\": "src"
+      "Toporlabs\\Regulations\\": "src"
     }
   },
   "require": {
